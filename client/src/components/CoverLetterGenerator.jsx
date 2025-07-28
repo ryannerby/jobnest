@@ -1,9 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
 
-function CoverLetterGenerator({ job, isOpen, onClose, globalResume }) {
+function CoverLetterGenerator({ job, onClose, globalResume }) {
   const [customResume, setCustomResume] = useState("");
-  const [useCustomResume, setUseCustomResume] = useState(false);
+  const [useGlobalResume, setUseGlobalResume] = useState(true);
   const [generatedCoverLetter, setGeneratedCoverLetter] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
@@ -13,10 +13,10 @@ function CoverLetterGenerator({ job, isOpen, onClose, globalResume }) {
     setError("");
     
     try {
-      const resumeToUse = useCustomResume ? customResume : globalResume;
+      const resumeText = useGlobalResume ? globalResume : customResume;
       
-      if (!resumeToUse) {
-        setError("Please provide a resume (either global or custom)");
+      if (!resumeText.trim()) {
+        setError("Please provide a resume");
         setIsGenerating(false);
         return;
       }
@@ -25,8 +25,7 @@ function CoverLetterGenerator({ job, isOpen, onClose, globalResume }) {
         jobTitle: job.title,
         company: job.company,
         jobDescription: job.notes || "",
-        resume: resumeToUse,
-        jobLink: job.link || ""
+        resume: resumeText
       });
 
       setGeneratedCoverLetter(response.data.coverLetter);
@@ -51,12 +50,6 @@ function CoverLetterGenerator({ job, isOpen, onClose, globalResume }) {
     }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(generatedCoverLetter);
-  };
-
-  if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -80,94 +73,104 @@ function CoverLetterGenerator({ job, isOpen, onClose, globalResume }) {
             </div>
           </div>
 
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-2">Resume Selection</h3>
+          {!generatedCoverLetter ? (
             <div className="space-y-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  checked={!useCustomResume}
-                  onChange={() => setUseCustomResume(false)}
-                  className="mr-2"
-                />
-                Use Global Resume
-              </label>
-              
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  checked={useCustomResume}
-                  onChange={() => setUseCustomResume(true)}
-                  className="mr-2"
-                />
-                Use Custom Resume
-              </label>
-
-              {useCustomResume && (
-                <textarea
-                  value={customResume}
-                  onChange={(e) => setCustomResume(e.target.value)}
-                  placeholder="Paste your custom resume here..."
-                  className="w-full h-32 border rounded p-2"
-                />
-              )}
-
-              {!useCustomResume && globalResume && (
-                <div className="bg-gray-50 p-4 rounded">
-                  <p className="text-sm text-gray-600">Using global resume (first 200 characters shown):</p>
-                  <p className="text-sm">{globalResume.substring(0, 200)}...</p>
-                </div>
-              )}
-
-              {!useCustomResume && !globalResume && (
-                <p className="text-red-500 text-sm">No global resume set. Please use custom resume or set a global resume.</p>
-              )}
-            </div>
-          </div>
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-              {error}
-            </div>
-          )}
-
-          <div className="flex gap-2 mb-6">
-            <button
-              onClick={handleGenerate}
-              disabled={isGenerating || (!useCustomResume && !globalResume)}
-              className="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-dark disabled:bg-gray-300 disabled:cursor-not-allowed"
-            >
-              {isGenerating ? "Generating..." : "Generate Cover Letter"}
-            </button>
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-            >
-              Cancel
-            </button>
-          </div>
-
-          {generatedCoverLetter && (
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-lg font-semibold">Generated Cover Letter</h3>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleCopy}
-                    className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
-                  >
-                    Copy
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-                  >
-                    Save to Job
-                  </button>
+              <div>
+                <label className="block font-medium mb-2">Resume Source</label>
+                <div className="space-y-2">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      checked={useGlobalResume}
+                      onChange={() => setUseGlobalResume(true)}
+                      className="mr-2"
+                    />
+                    Use Global Resume
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      checked={!useGlobalResume}
+                      onChange={() => setUseGlobalResume(false)}
+                      className="mr-2"
+                    />
+                    Use Custom Resume
+                  </label>
                 </div>
               </div>
-              <div className="border rounded p-4 bg-gray-50 max-h-96 overflow-y-auto">
-                <pre className="whitespace-pre-wrap text-sm font-sans">{generatedCoverLetter}</pre>
+
+              {!useGlobalResume && (
+                <div>
+                  <label className="block font-medium mb-2">Custom Resume</label>
+                  <textarea
+                    value={customResume}
+                    onChange={(e) => setCustomResume(e.target.value)}
+                    placeholder="Paste your resume here..."
+                    className="w-full border rounded px-3 py-2 h-32 resize-none"
+                  />
+                </div>
+              )}
+
+              {useGlobalResume && globalResume && (
+                <div>
+                  <label className="block font-medium mb-2">Global Resume Preview</label>
+                  <div className="bg-gray-50 p-3 rounded text-sm max-h-32 overflow-y-auto">
+                    {globalResume.substring(0, 200)}...
+                  </div>
+                </div>
+              )}
+
+              {error && (
+                <div className="text-red-600 text-sm">{error}</div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
+                  className="px-6 py-2 bg-blue-accent text-white rounded hover:bg-blue-dark transition disabled:opacity-50"
+                >
+                  {isGenerating ? "Generating..." : "Generate Cover Letter"}
+                </button>
+                <button
+                  onClick={onClose}
+                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block font-medium mb-2">Generated Cover Letter</label>
+                <textarea
+                  value={generatedCoverLetter}
+                  onChange={(e) => setGeneratedCoverLetter(e.target.value)}
+                  className="w-full border rounded px-3 py-2 h-64 resize-none"
+                  placeholder="Generated cover letter will appear here..."
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleSave}
+                  className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                >
+                  Save to Job
+                </button>
+                <button
+                  onClick={() => setGeneratedCoverLetter("")}
+                  className="px-6 py-2 bg-blue-accent text-white rounded hover:bg-blue-dark transition"
+                >
+                  Regenerate
+                </button>
+                <button
+                  onClick={onClose}
+                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           )}

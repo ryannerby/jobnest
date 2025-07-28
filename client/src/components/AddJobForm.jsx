@@ -11,6 +11,7 @@ function AddJobForm({ onSuccess, editingJob }) {
     deadline: "",
     notes: "",
     link: "",
+    cover_letter: "",
   });
 
   useEffect(() => {
@@ -82,6 +83,17 @@ function AddJobForm({ onSuccess, editingJob }) {
       <div>
         <label className="block font-medium">Notes</label>
         <textarea name="notes" value={form.notes} onChange={handleChange} className="w-full border rounded px-2 py-1" />
+      </div>
+
+      <div>
+        <label className="block font-medium">Cover Letter</label>
+        <textarea 
+          name="cover_letter" 
+          value={form.cover_letter} 
+          onChange={handleChange} 
+          className="w-full border rounded px-2 py-1 h-32 resize-none" 
+          placeholder="Cover letter content..."
+        />
       </div>
 
       <button type="submit" className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">

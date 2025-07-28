@@ -1,6 +1,7 @@
 import { useState } from "react";
 import JobList from "./components/JobList";
 import AddJobForm from "./components/AddJobForm";
+import GlobalResumeManager from "./components/GlobalResumeManager";
 
 const statuses = ["all", "wishlist", "applied", "interview", "offer", "rejected"];
 
@@ -9,6 +10,8 @@ function App() {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const [filter, setFilter] = useState("all");
   const [editingJob, setEditingJob] = useState(null);
+  const [globalResume, setGlobalResume] = useState(localStorage.getItem("globalResume") || "");
+  const [showResumeManager, setShowResumeManager] = useState(false);
 
   return (
     <div className="min-h-screen bg-cream text-stone px-6 py-10 font-sans">
@@ -29,15 +32,23 @@ function App() {
         ))}
       </div>
 
-      <button
-        onClick={() => {
-          setEditingJob(null);
-          setShowForm(!showForm);
-        }}
-        className="mb-6 px-6 py-2 bg-blue-accent text-white rounded-full shadow hover:bg-blue-dark transition"
-      >
-        {showForm && !editingJob ? "Cancel" : "Add Job"}
-      </button>
+      <div className="flex gap-3 mb-6">
+        <button
+          onClick={() => {
+            setEditingJob(null);
+            setShowForm(!showForm);
+          }}
+          className="px-6 py-2 bg-blue-accent text-white rounded-full shadow hover:bg-blue-dark transition"
+        >
+          {showForm && !editingJob ? "Cancel" : "Add Job"}
+        </button>
+        <button
+          onClick={() => setShowResumeManager(true)}
+          className="px-6 py-2 bg-green-600 text-white rounded-full shadow hover:bg-green-700 transition"
+        >
+          Manage Resume
+        </button>
+      </div>
 
       {showForm && (
         <AddJobForm
@@ -53,11 +64,23 @@ function App() {
       <JobList
         refreshFlag={refreshFlag}
         filter={filter}
+        globalResume={globalResume}
         onEdit={(job) => {
           setEditingJob(job);
           setShowForm(true);
         }}
       />
+
+      {showResumeManager && (
+        <GlobalResumeManager
+          globalResume={globalResume}
+          onUpdateResume={(resume) => {
+            setGlobalResume(resume);
+            localStorage.setItem("globalResume", resume);
+          }}
+          onClose={() => setShowResumeManager(false)}
+        />
+      )}
     </div>
   );
 }

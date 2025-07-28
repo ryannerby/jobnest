@@ -1,11 +1,13 @@
 // src/components/JobList.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
+import CoverLetterGenerator from "./CoverLetterGenerator";
 
 function JobList({
   refreshFlag,
   filter,
   onEdit,
+  globalResume,
   cardStyle = "bg-white rounded-lg shadow-sm border border-gray-light p-4 transition hover:shadow-md",
   titleStyle = "text-lg font-bold text-stone font-display tracking-tight",
   metaStyle = "text-sm font-medium text-gray-dark font-sans",
@@ -14,6 +16,8 @@ function JobList({
 }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCoverLetterGenerator, setShowCoverLetterGenerator] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   useEffect(() => {
     axios.get("http://localhost:3001/api/jobs")
@@ -101,6 +105,13 @@ function JobList({
               ) : (
                 <span className="text-gray-medium text-sm">-</span>
               )}
+              {job.cover_letter && (
+                <div className="mt-1">
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    📄 Cover Letter
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
@@ -113,6 +124,16 @@ function JobList({
                 ✏️
               </button>
               <button
+                onClick={() => {
+                  setSelectedJob(job);
+                  setShowCoverLetterGenerator(true);
+                }}
+                className="px-1.5 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-medium flex-shrink-0"
+                title="Generate Cover Letter"
+              >
+                📝
+              </button>
+              <button
                 onClick={() => handleDelete(job.id)}
                 className="px-1.5 py-1 text-xs bg-gray-medium text-white rounded hover:bg-gray-dark transition-colors font-medium flex-shrink-0"
                 title="Delete"
@@ -123,6 +144,17 @@ function JobList({
           </div>
         </div>
       ))}
+
+      {showCoverLetterGenerator && selectedJob && (
+        <CoverLetterGenerator
+          job={selectedJob}
+          globalResume={globalResume}
+          onClose={() => {
+            setShowCoverLetterGenerator(false);
+            setSelectedJob(null);
+          }}
+        />
+      )}
     </div>
   );
 }
