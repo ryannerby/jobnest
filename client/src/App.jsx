@@ -2,6 +2,7 @@ import { useState } from "react";
 import JobList from "./components/JobList";
 import AddJobForm from "./components/AddJobForm";
 import GlobalResumeManager from "./components/GlobalResumeManager";
+import Logo from "./components/Logo";
 
 const statuses = ["all", "wishlist", "applied", "interview", "offer", "rejected"];
 
@@ -14,75 +15,103 @@ function App() {
   const [showResumeManager, setShowResumeManager] = useState(false);
 
   return (
-    <div className="min-h-screen bg-cream text-stone px-6 py-10 font-sans">
-      <h1 className="text-6xl text-stone font-bold mb-8 tracking-tight font-display">JobNest</h1>
+    <div className="min-h-screen bg-gradient-to-br from-neutral-pebble to-white text-neutral-highTide font-sans">
+      {/* Header Section */}
+      <div className="bg-white shadow-card border-b border-neutral-pebble">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Logo size="large" />
+              <div className="h-12 w-1 bg-gradient-to-b from-primary-blue to-primary-lime rounded-full"></div>
+              <p className="text-neutral-cadet font-medium text-lg">Your Career Command Center</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-primary-lime rounded-full animate-pulse-slow"></div>
+              <span className="text-sm text-neutral-cadet font-medium">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        {statuses.map((status) => (
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Filter Buttons */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          {statuses.map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilter(status)}
+              className={`px-6 py-3 rounded-xl border-2 font-semibold transition-all duration-200 text-sm shadow-card
+                ${filter === status
+                  ? "bg-primary-blue text-white border-primary-blue shadow-punch"
+                  : "border-neutral-cadet text-neutral-cadet hover:bg-neutral-cadet hover:text-white hover:shadow-card"}`}
+            >
+              {status[0].toUpperCase() + status.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4 mb-8">
           <button
-            key={status}
-            onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-full border-2 font-semibold transition-all text-sm
-              ${filter === status
-                ? "bg-blue-accent text-white border-blue-accent"
-                : "border-blue-accent text-blue-accent hover:bg-blue-accent hover:text-white"}`}
+            onClick={() => {
+              setEditingJob(null);
+              setShowForm(!showForm);
+            }}
+            className="px-8 py-3 bg-primary-blue text-white rounded-xl shadow-punch hover:shadow-lg transition-all duration-200 font-semibold flex items-center space-x-2"
           >
-            {status[0].toUpperCase() + status.slice(1)}
+            <span>{showForm && !editingJob ? "Cancel" : "Add Job"}</span>
+            {!showForm && (
+              <div className="w-2 h-2 bg-primary-lime rounded-full"></div>
+            )}
           </button>
-        ))}
-      </div>
+          <button
+            onClick={() => setShowResumeManager(true)}
+            className="px-8 py-3 bg-primary-lime text-neutral-highTide rounded-xl shadow-lime-glow hover:shadow-lg transition-all duration-200 font-semibold"
+          >
+            Manage Resume
+          </button>
+        </div>
 
-      <div className="flex gap-3 mb-6">
-        <button
-          onClick={() => {
-            setEditingJob(null);
-            setShowForm(!showForm);
-          }}
-          className="px-6 py-2 bg-blue-accent text-white rounded-full shadow hover:bg-blue-dark transition"
-        >
-          {showForm && !editingJob ? "Cancel" : "Add Job"}
-        </button>
-        <button
-          onClick={() => setShowResumeManager(true)}
-          className="px-6 py-2 bg-green-600 text-white rounded-full shadow hover:bg-green-700 transition"
-        >
-          Manage Resume
-        </button>
-      </div>
+        {/* Form Section */}
+        {showForm && (
+          <div className="mb-8">
+            <AddJobForm
+              editingJob={editingJob}
+              onSuccess={() => {
+                setShowForm(false);
+                setEditingJob(null);
+                setRefreshFlag(!refreshFlag);
+              }}
+            />
+          </div>
+        )}
 
-      {showForm && (
-        <AddJobForm
-          editingJob={editingJob}
-          onSuccess={() => {
-            setShowForm(false);
-            setEditingJob(null);
-            setRefreshFlag(!refreshFlag);
-          }}
-        />
-      )}
-
-      <JobList
-        refreshFlag={refreshFlag}
-        filter={filter}
-        globalResume={globalResume}
-        onEdit={(job) => {
-          setEditingJob(job);
-          setShowForm(true);
-        }}
-      />
-
-      {showResumeManager && (
-        <GlobalResumeManager
+        {/* Job List */}
+        <JobList
+          refreshFlag={refreshFlag}
+          filter={filter}
           globalResume={globalResume}
-          onUpdateResume={(resume) => {
-            setGlobalResume(resume);
-            localStorage.setItem("globalResume", resume);
+          onEdit={(job) => {
+            setEditingJob(job);
+            setShowForm(true);
           }}
-          onClose={() => setShowResumeManager(false)}
         />
-      )}
+
+        {/* Resume Manager Modal */}
+        {showResumeManager && (
+          <GlobalResumeManager
+            globalResume={globalResume}
+            onUpdateResume={(resume) => {
+              setGlobalResume(resume);
+              localStorage.setItem("globalResume", resume);
+            }}
+            onClose={() => setShowResumeManager(false)}
+          />
+        )}
+      </div>
     </div>
   );
 }
 
-export default App; // with styled card props
+export default App;

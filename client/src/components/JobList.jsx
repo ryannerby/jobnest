@@ -8,11 +8,11 @@ function JobList({
   filter,
   onEdit,
   globalResume,
-  cardStyle = "bg-white rounded-lg shadow-sm border border-gray-light p-4 transition hover:shadow-md",
-  titleStyle = "text-lg font-bold text-stone font-display tracking-tight",
-  metaStyle = "text-sm font-medium text-gray-dark font-sans",
-  linkStyle = "text-blue-accent underline hover:text-blue-dark font-sans text-sm font-medium",
-  notesStyle = "text-gray-dark text-sm leading-relaxed font-sans italic"
+  cardStyle = "bg-white rounded-xl shadow-card border border-neutral-pebble p-6 transition-all duration-200 hover:shadow-lg hover:border-primary-blue/20",
+  titleStyle = "text-lg font-bold text-neutral-highTide font-display tracking-tight",
+  metaStyle = "text-sm font-medium text-neutral-cadet font-sans",
+  linkStyle = "inline-flex items-center space-x-2 px-3 py-1.5 bg-primary-blue/10 text-primary-blue rounded-lg hover:bg-primary-blue hover:text-white transition-all duration-200 font-medium text-sm border border-primary-blue/20 hover:border-primary-blue",
+  notesStyle = "text-neutral-cadet text-sm leading-relaxed font-sans italic"
 }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,26 +43,51 @@ function JobList({
 
   const filteredJobs = filter === "all" ? jobs : jobs.filter((job) => job.status === filter);
 
-  if (loading) return <p className="font-display text-stone">Loading jobs...</p>;
+  const getStatusStyle = (status) => {
+    const baseClasses = "px-3 py-1 rounded-full text-xs font-semibold";
+    switch (status) {
+      case 'applied':
+        return `${baseClasses} bg-primary-blue/10 text-primary-blue border border-primary-blue/20`;
+      case 'interview':
+        return `${baseClasses} bg-warning/10 text-warning border border-warning/20`;
+      case 'offer':
+        return `${baseClasses} bg-success/10 text-success border border-success/20`;
+      case 'rejected':
+        return `${baseClasses} bg-error/10 text-error border border-error/20`;
+      case 'wishlist':
+        return `${baseClasses} bg-primary-lime/10 text-neutral-highTide border border-primary-lime/20`;
+      default:
+        return `${baseClasses} bg-neutral-cadet/10 text-neutral-cadet border border-neutral-cadet/20`;
+    }
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-12">
+      <div className="flex items-center space-x-3">
+        <div className="w-6 h-6 bg-primary-blue rounded-full animate-pulse"></div>
+        <p className="font-display text-neutral-cadet text-lg">Loading jobs...</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {/* Header Row */}
-      <div className="bg-gray-light/30 rounded-lg p-4 grid grid-cols-12 gap-3 items-center font-sans text-sm font-semibold text-gray-dark">
-        <div className="col-span-4">Position</div>
+      <div className="bg-neutral-pebble/50 rounded-xl p-6 grid grid-cols-12 gap-4 items-center font-sans text-sm font-bold text-neutral-cadet border border-neutral-pebble">
+        <div className="col-span-3">Position</div>
         <div className="col-span-2">Company</div>
         <div className="col-span-2">Status</div>
         <div className="col-span-2">Link</div>
-        <div className="col-span-1">Notes</div>
+        <div className="col-span-2">Notes</div>
         <div className="col-span-1">Actions</div>
       </div>
 
       {/* Job Rows */}
       {filteredJobs.map((job) => (
         <div key={job.id} className={cardStyle}>
-          <div className="grid grid-cols-12 gap-3 items-center">
+          <div className="grid grid-cols-12 gap-4 items-center">
             {/* Position */}
-            <div className="col-span-4">
+            <div className="col-span-3">
               <h3 className={titleStyle}>{job.title}</h3>
             </div>
 
@@ -73,14 +98,7 @@ function JobList({
 
             {/* Status */}
             <div className="col-span-2">
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                job.status === 'applied' ? 'bg-blue-accent/20 text-blue-accent' :
-                job.status === 'interview' ? 'bg-yellow-500/20 text-yellow-600' :
-                job.status === 'offer' ? 'bg-green-500/20 text-green-600' :
-                job.status === 'rejected' ? 'bg-red-500/20 text-red-600' :
-                job.status === 'wishlist' ? 'bg-purple-500/20 text-purple-600' :
-                'bg-gray-500/20 text-gray-600'
-              }`}>
+              <span className={getStatusStyle(job.status)}>
                 {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
               </span>
             </div>
@@ -88,64 +106,76 @@ function JobList({
             {/* Link */}
             <div className="col-span-2">
               {job.link ? (
-                <a href={job.link} target="_blank" rel="noopener noreferrer" className={linkStyle}>
-                  View listing
+                <a 
+                  href={job.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className={linkStyle}
+                >
+                  <span>🔗</span>
+                  <span>View listing</span>
                 </a>
               ) : (
-                <span className="text-gray-medium text-sm">No link</span>
+                <span className="text-neutral-cadet/40 text-sm font-medium">No link</span>
               )}
             </div>
 
             {/* Notes */}
-            <div className="col-span-1">
+            <div className="col-span-2">
               {job.notes ? (
-                <p className={notesStyle} title={job.notes}>
-                  {job.notes.length > 15 ? job.notes.substring(0, 15) + '...' : job.notes}
-                </p>
+                <span className="text-neutral-cadet/60 text-sm">📝</span>
               ) : (
-                <span className="text-gray-medium text-sm">-</span>
-              )}
-              {job.cover_letter && (
-                <div className="mt-1">
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                    📄 Cover Letter
-                  </span>
-                </div>
+                <span className="text-neutral-cadet/30 text-sm">—</span>
               )}
             </div>
 
             {/* Actions */}
-            <div className="col-span-1 flex gap-1 min-w-0">
+            <div className="col-span-1 flex items-center justify-end space-x-1 min-w-0">
               <button
                 onClick={() => onEdit(job)}
-                className="px-1.5 py-1 text-xs bg-blue-accent text-white rounded hover:bg-blue-dark transition-colors font-medium flex-shrink-0"
-                title="Edit"
+                className="p-2 text-primary-blue hover:bg-primary-blue/10 rounded-lg transition-colors flex-shrink-0"
+                title="Edit job"
               >
                 ✏️
+              </button>
+              <button
+                onClick={() => handleDelete(job.id)}
+                className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors flex-shrink-0"
+                title="Delete job"
+              >
+                🗑️
               </button>
               <button
                 onClick={() => {
                   setSelectedJob(job);
                   setShowCoverLetterGenerator(true);
                 }}
-                className="px-1.5 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-medium flex-shrink-0"
-                title="Generate Cover Letter"
+                className="p-2 text-primary-lime hover:bg-primary-lime/10 rounded-lg transition-colors flex-shrink-0"
+                title="Generate cover letter"
               >
-                📝
-              </button>
-              <button
-                onClick={() => handleDelete(job.id)}
-                className="px-1.5 py-1 text-xs bg-gray-medium text-white rounded hover:bg-gray-dark transition-colors font-medium flex-shrink-0"
-                title="Delete"
-              >
-                🗑️
+                📄
               </button>
             </div>
           </div>
+
+          {/* Notes Display */}
+          {job.notes && (
+            <div className="mt-4 pt-4 border-t border-neutral-pebble">
+              <p className={notesStyle}>{job.notes}</p>
+            </div>
+          )}
         </div>
       ))}
 
-      {showCoverLetterGenerator && selectedJob && (
+      {filteredJobs.length === 0 && (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">📋</div>
+          <p className="text-neutral-cadet text-lg font-medium">No jobs found</p>
+          <p className="text-neutral-cadet/60 text-sm mt-2">Add your first job to get started!</p>
+        </div>
+      )}
+
+      {showCoverLetterGenerator && (
         <CoverLetterGenerator
           job={selectedJob}
           globalResume={globalResume}
