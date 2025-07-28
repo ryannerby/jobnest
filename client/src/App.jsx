@@ -11,19 +11,18 @@ function App() {
   const [editingJob, setEditingJob] = useState(null);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-6">JobNest</h1>
+    <div className="min-h-screen bg-cream text-stone px-6 py-10 font-sans">
+      <h1 className="text-6xl text-stone font-bold mb-8 tracking-tight font-display">JobNest</h1>
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        {statuses.map(status => (
+      <div className="flex flex-wrap gap-2 mb-6">
+        {statuses.map((status) => (
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-3 py-1 rounded ${
-              filter === status
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800"
-            }`}
+            className={`px-4 py-2 rounded-full border-2 font-semibold transition-all text-sm
+              ${filter === status
+                ? "bg-blue-accent text-white border-blue-accent"
+                : "border-blue-accent text-blue-accent hover:bg-blue-accent hover:text-white"}`}
           >
             {status[0].toUpperCase() + status.slice(1)}
           </button>
@@ -35,7 +34,7 @@ function App() {
           setEditingJob(null);
           setShowForm(!showForm);
         }}
-        className="mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        className="mb-6 px-6 py-2 bg-blue-accent text-white rounded-full shadow hover:bg-blue-dark transition"
       >
         {showForm && !editingJob ? "Cancel" : "Add Job"}
       </button>
@@ -51,12 +50,16 @@ function App() {
         />
       )}
 
-      <JobList refreshFlag={refreshFlag} filter={filter} onEdit={(job) => {
-        setEditingJob(job);
-        setShowForm(true);
-      }} />
+      <JobList
+        refreshFlag={refreshFlag}
+        filter={filter}
+        onEdit={(job) => {
+          setEditingJob(job);
+          setShowForm(true);
+        }}
+      />
     </div>
   );
 }
 
-export default App;
+export default App; // with styled card props
