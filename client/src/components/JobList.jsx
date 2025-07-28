@@ -18,6 +18,20 @@ function JobList({ refreshFlag, filter }) {
       });
   }, [refreshFlag]);
 
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this job?")) return;
+    try {
+      await axios.delete(`http://localhost:3001/api/jobs/${id}`);
+      setJobs(prev => prev.filter(job => job.id !== id));
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  };
+
+  const handleEdit = (job) => {
+    alert(`Editing job: ${job.title}`); // Placeholder for now
+  };
+
   const filteredJobs = filter === "all"
     ? jobs
     : jobs.filter(job => job.status === filter);
@@ -39,6 +53,22 @@ function JobList({ refreshFlag, filter }) {
               </a>
             )}
             {job.notes && <p className="mt-2 text-gray-700 text-sm">{job.notes}</p>}
+
+            {/* Edit/Delete buttons */}
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => handleEdit(job)}
+                className="px-3 py-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(job.id)}
+                className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         ))
       )}
@@ -47,4 +77,3 @@ function JobList({ refreshFlag, filter }) {
 }
 
 export default JobList;
-
