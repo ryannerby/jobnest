@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-function JobList({ refreshFlag, filter }) {
+function JobList({ refreshFlag, filter, onEdit }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,7 @@ function JobList({ refreshFlag, filter }) {
   };
 
   const handleEdit = (job) => {
-    alert(`Editing job: ${job.title}`); // Placeholder for now
+    onEdit(job);
   };
 
   const filteredJobs = filter === "all"

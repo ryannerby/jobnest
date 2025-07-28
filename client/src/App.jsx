@@ -8,6 +8,7 @@ function App() {
   const [showForm, setShowForm] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [editingJob, setEditingJob] = useState(null);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -30,22 +31,30 @@ function App() {
       </div>
 
       <button
-        onClick={() => setShowForm(!showForm)}
+        onClick={() => {
+          setEditingJob(null);
+          setShowForm(!showForm);
+        }}
         className="mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
       >
-        {showForm ? "Cancel" : "Add Job"}
+        {showForm && !editingJob ? "Cancel" : "Add Job"}
       </button>
 
       {showForm && (
         <AddJobForm
+          editingJob={editingJob}
           onSuccess={() => {
             setShowForm(false);
+            setEditingJob(null);
             setRefreshFlag(!refreshFlag);
           }}
         />
       )}
 
-      <JobList refreshFlag={refreshFlag} filter={filter} />
+      <JobList refreshFlag={refreshFlag} filter={filter} onEdit={(job) => {
+        setEditingJob(job);
+        setShowForm(true);
+      }} />
     </div>
   );
 }

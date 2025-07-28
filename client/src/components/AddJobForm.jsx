@@ -1,8 +1,8 @@
 // src/components/AddJobForm.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
-function AddJobForm({ onSuccess }) {
+function AddJobForm({ onSuccess, editingJob }) {
   const [form, setForm] = useState({
     company: "",
     title: "",
@@ -13,22 +13,35 @@ function AddJobForm({ onSuccess }) {
     link: "",
   });
 
+  useEffect(() => {
+    if (editingJob) {
+      setForm(editingJob);
+    }
+  }, [editingJob]);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await axios.post("http://localhost:3001/api/jobs", form);
-      onSuccess();
+      if (editingJob) {
+        await axios.put(`http://localhost:3001/api/jobs/${editingJob.id}`, form);
+      } else {
+        await axios.post("http://localhost:3001/api/jobs", form);
+      }
+      onSuccess(); // Triggers refresh + hide form
     } catch (err) {
-      console.error("Failed to add job:", err);
+      console.error("Submit failed:", err);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow mb-6 space-y-4">
+      <h2 className="text-lg font-bold">{editingJob ? "Edit Job" : "Add New Job"}</h2>
+
       <div>
         <label className="block font-medium">Company</label>
         <input name="company" value={form.company} onChange={handleChange} className="w-full border rounded px-2 py-1" required />
@@ -72,7 +85,7 @@ function AddJobForm({ onSuccess }) {
       </div>
 
       <button type="submit" className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-        Submit
+        {editingJob ? "Update Job" : "Submit"}
       </button>
     </form>
   );
