@@ -33,6 +33,30 @@ function JobList({
       });
   }, [refreshFlag, refresh]);
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && expandedJobId) {
+        setExpandedJobId(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [expandedJobId]);
+
+  // Click outside to close
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (expandedJobId && !e.target.closest('.job-card')) {
+        setExpandedJobId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [expandedJobId]);
+
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this job?")) return;
     try {
@@ -47,7 +71,7 @@ function JobList({
   const filteredJobs = filter === "all" ? jobs : jobs.filter((job) => job.status === filter);
 
   const getStatusStyle = (status) => {
-    const baseClasses = "px-3 py-1 rounded-full text-xs font-semibold";
+    const baseClasses = "px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1";
     switch (status) {
       case 'applied':
         return `${baseClasses} bg-primary-blue/10 text-primary-blue border border-primary-blue/20`;
@@ -62,6 +86,27 @@ function JobList({
       default:
         return `${baseClasses} bg-neutral-cadet/10 text-neutral-cadet border border-neutral-cadet/20`;
     }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'wishlist': return '📋';
+      case 'applied': return '📤';
+      case 'interview': return '🤝';
+      case 'offer': return '🎉';
+      case 'rejected': return '❌';
+      default: return '📝';
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+    });
   };
 
   if (loading) return (
@@ -80,7 +125,8 @@ function JobList({
         <div className="col-span-4">Position</div>
         <div className="col-span-2">Company</div>
         <div className="col-span-2">Status</div>
-        <div className="col-span-3">Link</div>
+        <div className="col-span-2">Applied</div>
+        <div className="col-span-1">Link</div>
         <div className="col-span-1"></div>
       </div>
 
@@ -90,7 +136,7 @@ function JobList({
         return (
           <div
             key={job.id}
-            className={cardStyle + (isExpanded ? " ring-2 ring-primary-blue/30" : " cursor-pointer")}
+            className={`job-card ${cardStyle} ${isExpanded ? "ring-2 ring-primary-blue/30 shadow-xl animate-slide-down" : "cursor-pointer hover-lift"} transition-all duration-300 ease-in-out`}
             onClick={() => !isExpanded && setExpandedJobId(job.id)}
           >
             {!isExpanded ? (
@@ -98,6 +144,9 @@ function JobList({
                 {/* Position */}
                 <div className="col-span-4">
                   <h3 className={titleStyle}>{job.title}</h3>
+                  {job.notes && (
+                    <p className="text-neutral-cadet/60 text-sm mt-1 line-clamp-1">{job.notes}</p>
+                  )}
                 </div>
                 {/* Company */}
                 <div className="col-span-2">
@@ -106,31 +155,62 @@ function JobList({
                 {/* Status */}
                 <div className="col-span-2">
                   <span className={getStatusStyle(job.status)}>
-                    {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                    <span>{getStatusIcon(job.status)}</span>
+                    <span className="hidden sm:inline">{job.status.charAt(0).toUpperCase() + job.status.slice(1)}</span>
                   </span>
                 </div>
+                {/* Application Date */}
+                <div className="col-span-2">
+                  {job.application_date ? (
+                    <span className="text-neutral-cadet text-sm font-medium">
+                      {formatDate(job.application_date)}
+                    </span>
+                  ) : (
+                    <span className="text-neutral-cadet/40 text-sm font-medium">Not applied</span>
+                  )}
+                </div>
                 {/* Link */}
-                <div className="col-span-3">
+                <div className="col-span-1">
                   {job.link ? (
                     <a
                       href={job.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={linkStyle}
+                      className="inline-flex items-center justify-center w-8 h-8 text-primary-blue hover:bg-primary-blue/10 rounded-lg transition-colors"
                       onClick={e => e.stopPropagation()}
+                      title="View job listing"
                     >
-                      <span>🔗</span>
-                      <span>View listing</span>
+                      🔗
                     </a>
                   ) : (
-                    <span className="text-neutral-cadet/40 text-sm font-medium">No link</span>
+                    <span className="text-neutral-cadet/30 text-sm">—</span>
                   )}
                 </div>
-                {/* No actions or icons on front */}
-                <div className="col-span-1"></div>
+                {/* Expand indicator */}
+                <div className="col-span-1 flex justify-end">
+                  <div className="w-6 h-6 text-neutral-cadet/40 hover:text-neutral-cadet transition-colors">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div onClick={e => e.stopPropagation()}>
+              <div onClick={e => e.stopPropagation()} className="space-y-6 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-primary-blue rounded-xl flex items-center justify-center">
+                      <span className="text-white font-bold text-lg">✏️</span>
+                    </div>
+                    <h2 className="text-2xl font-bold text-neutral-highTide font-display">Edit Job</h2>
+                  </div>
+                  <button
+                    onClick={() => setExpandedJobId(null)}
+                    className="w-10 h-10 bg-neutral-pebble rounded-xl flex items-center justify-center text-neutral-cadet hover:bg-neutral-cadet hover:text-white transition-all duration-200 text-xl font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
                 <AddJobForm
                   editingJob={job}
                   onSuccess={() => {
@@ -141,8 +221,9 @@ function JobList({
                     setSelectedJob(job);
                     setShowCoverLetterGenerator(true);
                   }}
+                  hideCancel={true}
                 />
-                <div className="flex flex-col md:flex-row gap-4 mt-6 justify-between items-center">
+                <div className="flex flex-col md:flex-row gap-4 justify-between items-center pt-4 border-t border-neutral-pebble">
                   <button
                     onClick={() => handleDelete(job.id)}
                     className="px-6 py-3 bg-error text-white rounded-xl shadow hover:bg-error/80 transition-all duration-200 font-semibold flex items-center space-x-2"
@@ -150,12 +231,9 @@ function JobList({
                     <span>🗑️</span>
                     <span>Delete Job</span>
                   </button>
-                  <button
-                    onClick={() => setExpandedJobId(null)}
-                    className="px-6 py-3 border border-neutral-cadet text-neutral-cadet rounded-xl hover:bg-neutral-cadet hover:text-white transition-all duration-200 font-semibold"
-                  >
-                    Close
-                  </button>
+                  <div className="flex items-center space-x-2 text-neutral-cadet text-sm">
+                    <span>Click outside or press Esc to close</span>
+                  </div>
                 </div>
               </div>
             )}
