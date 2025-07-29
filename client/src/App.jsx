@@ -20,18 +20,8 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-neutral-pebble to-white text-neutral-highTide font-sans">
       {/* Header Section */}
       <div className="bg-white shadow-card border-b border-neutral-pebble">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Logo size="large" />
-              <div className="h-12 w-1 bg-gradient-to-b from-primary-blue to-primary-lime rounded-full"></div>
-              <p className="text-neutral-cadet font-medium text-lg">Your Career Command Center</p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-primary-lime rounded-full animate-pulse-slow"></div>
-              <span className="text-sm text-neutral-cadet font-medium">Active</span>
-            </div>
-          </div>
+        <div className="flex justify-start items-center py-4 pl-8">
+          <Logo size="xsmall" />
         </div>
       </div>
 
