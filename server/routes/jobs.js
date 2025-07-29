@@ -2,6 +2,11 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
+const Anthropic = require('@anthropic-ai/sdk');
+require('dotenv').config();
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
 // GET all jobs
 router.get('/', async (req, res) => {
@@ -68,15 +73,35 @@ router.delete('/:id', async (req, res) => {
 // Generate cover letter using AI
 router.post('/generate-cover-letter', async (req, res) => {
   const { jobTitle, company, jobDescription, resume } = req.body;
-  
+
   try {
-    // For now, we'll create a simple template-based cover letter
-    // In a real implementation, you would integrate with an AI service like OpenAI
-    const coverLetter = generateCoverLetter(jobTitle, company, jobDescription, resume);
-    
+    const prompt = `
+You are an expert career coach and resume writer. Write a professional, personalized cover letter for the following job application. Use the resume and job description to highlight the most relevant skills and experience. The tone should be confident, clear, and tailored to the company.
+
+Job Title: ${jobTitle}
+Company: ${company}
+Job Description: ${jobDescription}
+Resume: ${resume}
+
+The cover letter should be ready to send, starting with "Dear Hiring Manager," and ending with "Sincerely, [Your Name]".
+`;
+
+    const msg = await anthropic.messages.create({
+      model: "claude-3-haiku-20240307",
+      max_tokens: 1024,
+      temperature: 0.2,
+      system: "You are a helpful assistant.",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const coverLetter = msg.content[0].text;
     res.json({ coverLetter });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Claude API error:", err);
+    if (err.response) {
+      console.error("Claude API error response data:", err.response.data);
+    }
+    res.status(500).json({ error: "Failed to generate cover letter" });
   }
 });
 

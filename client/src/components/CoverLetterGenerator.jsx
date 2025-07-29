@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-function CoverLetterGenerator({ job, onClose, globalResume }) {
+function CoverLetterGenerator({ job, onClose, globalResume, onCoverLetterSaved }) {
   const [customResume, setCustomResume] = useState("");
   const [useGlobalResume, setUseGlobalResume] = useState(true);
   const [generatedCoverLetter, setGeneratedCoverLetter] = useState("");
@@ -21,7 +21,7 @@ function CoverLetterGenerator({ job, onClose, globalResume }) {
         return;
       }
 
-      const response = await axios.post("http://localhost:3001/api/generate-cover-letter", {
+      const response = await axios.post("http://localhost:3001/api/jobs/generate-cover-letter", {
         jobTitle: job.title,
         company: job.company,
         jobDescription: job.notes || "",
@@ -43,6 +43,7 @@ function CoverLetterGenerator({ job, onClose, globalResume }) {
         ...job,
         cover_letter: generatedCoverLetter
       });
+      if (onCoverLetterSaved) onCoverLetterSaved();
       onClose();
     } catch (err) {
       setError("Failed to save cover letter");

@@ -183,6 +183,7 @@ function JobList({
             setShowCoverLetterGenerator(false);
             setSelectedJob(null);
           }}
+          onCoverLetterSaved={typeof onCoverLetterSaved === 'function' ? onCoverLetterSaved : undefined}
         />
       )}
     </div>

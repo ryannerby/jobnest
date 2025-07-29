@@ -14,6 +14,8 @@ function App() {
   const [globalResume, setGlobalResume] = useState(localStorage.getItem("globalResume") || "");
   const [showResumeManager, setShowResumeManager] = useState(false);
 
+  const handleCoverLetterSaved = () => setRefreshFlag(f => !f);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-pebble to-white text-neutral-highTide font-sans">
       {/* Header Section */}
@@ -96,6 +98,7 @@ function App() {
             setEditingJob(job);
             setShowForm(true);
           }}
+          onCoverLetterSaved={handleCoverLetterSaved}
         />
 
         {/* Resume Manager Modal */}
