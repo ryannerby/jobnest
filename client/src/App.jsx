@@ -5,6 +5,7 @@ import AddJobForm from "./components/AddJobForm";
 import GlobalResumeManager from "./components/GlobalResumeManager";
 import Header from "./components/Header";
 import Logo from "./components/Logo";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const statuses = ["all", "wishlist", "applied", "interview", "offer", "rejected"];
 
@@ -31,14 +32,15 @@ function App() {
   const handleManageResume = () => setShowResumeManager(true);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-pebble to-white text-neutral-highTide font-sans">
-      <Header
-        onAddJob={handleAddJob}
-        onManageResume={handleManageResume}
-        showForm={showForm}
-        editingJob={editingJob}
-      />
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-br from-neutral-pebble to-white text-neutral-highTide font-sans">
+        <Header
+          onAddJob={handleAddJob}
+          onManageResume={handleManageResume}
+          showForm={showForm}
+          editingJob={editingJob}
+        />
+        <div className="max-w-7xl mx-auto px-6 py-8">
         <Routes>
           <Route path="/" element={
             <>
@@ -110,7 +112,8 @@ function App() {
           <Route path="/my-applications" element={<MyApplicationsPage />} />
         </Routes>
       </div>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
 

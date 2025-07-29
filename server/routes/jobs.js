@@ -3,7 +3,9 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const Anthropic = require('@anthropic-ai/sdk');
+const { validateJob, validateCoverLetter } = require('../middleware/validation');
 require('dotenv').config();
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
@@ -19,7 +21,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST a new job
-router.post('/', async (req, res) => {
+router.post('/', validateJob, async (req, res) => {
   const { company, title, status, application_date, deadline, notes, link, cover_letter } = req.body;
   try {
     const result = await pool.query(
@@ -30,15 +32,29 @@ router.post('/', async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Database error:', err);
+    res.status(500).json({ 
+      error: 'Failed to create job',
+      message: 'An error occurred while saving the job. Please try again.'
+    });
   }
 });
 
 // PUT (update) a job by ID
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateJob, async (req, res) => {
   const { id } = req.params;
   const { company, title, status, application_date, deadline, notes, link, cover_letter } = req.body;
+  
   try {
+    // Check if job exists
+    const existingJob = await pool.query('SELECT * FROM jobs WHERE id = $1', [id]);
+    if (existingJob.rows.length === 0) {
+      return res.status(404).json({ 
+        error: 'Job not found',
+        message: 'The job you are trying to update does not exist.'
+      });
+    }
+    
     const result = await pool.query(
       `UPDATE jobs SET
          company = $1,
@@ -55,7 +71,11 @@ router.put('/:id', async (req, res) => {
     );
     res.json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Database error:', err);
+    res.status(500).json({ 
+      error: 'Failed to update job',
+      message: 'An error occurred while updating the job. Please try again.'
+    });
   }
 });
 
@@ -63,15 +83,31 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
+    // Check if job exists
+    const existingJob = await pool.query('SELECT * FROM jobs WHERE id = $1', [id]);
+    if (existingJob.rows.length === 0) {
+      return res.status(404).json({ 
+        error: 'Job not found',
+        message: 'The job you are trying to delete does not exist.'
+      });
+    }
+    
     await pool.query('DELETE FROM jobs WHERE id = $1', [id]);
-    res.json({ success: true });
+    res.json({ 
+      success: true,
+      message: 'Job deleted successfully'
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Database error:', err);
+    res.status(500).json({ 
+      error: 'Failed to delete job',
+      message: 'An error occurred while deleting the job. Please try again.'
+    });
   }
 });
 
 // Generate cover letter using AI
-router.post('/generate-cover-letter', async (req, res) => {
+router.post('/generate-cover-letter', validateCoverLetter, async (req, res) => {
   const { jobTitle, company, jobDescription, resume } = req.body;
 
   try {
@@ -101,7 +137,10 @@ The cover letter should be ready to send, starting with "Dear Hiring Manager," a
     if (err.response) {
       console.error("Claude API error response data:", err.response.data);
     }
-    res.status(500).json({ error: "Failed to generate cover letter" });
+    res.status(500).json({ 
+      error: "Failed to generate cover letter",
+      message: "Unable to generate cover letter at this time. Please try again later."
+    });
   }
 });
 

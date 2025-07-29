@@ -20,6 +20,9 @@ function JobList({
   const [selectedJob, setSelectedJob] = useState(null); // for expanded card
   const [expandedJobId, setExpandedJobId] = useState(null); // for expanded card
   const [refresh, setRefresh] = useState(false); // to trigger refresh after edit/delete
+  const [searchTerm, setSearchTerm] = useState(''); // for search functionality
+  const [sortBy, setSortBy] = useState('id'); // for sorting
+  const [sortOrder, setSortOrder] = useState('desc'); // asc or desc
 
   useEffect(() => {
     axios.get("http://localhost:3001/api/jobs")
@@ -68,7 +71,55 @@ function JobList({
     }
   };
 
-  const filteredJobs = filter === "all" ? jobs : jobs.filter((job) => job.status === filter);
+  // Filter and sort jobs
+  const filteredAndSortedJobs = jobs
+    .filter((job) => {
+      // Status filter
+      const statusMatch = filter === "all" || job.status === filter;
+      
+      // Search filter
+      const searchMatch = !searchTerm || 
+        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.notes && job.notes.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      return statusMatch && searchMatch;
+    })
+    .sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortBy) {
+        case 'title':
+          aValue = a.title.toLowerCase();
+          bValue = b.title.toLowerCase();
+          break;
+        case 'company':
+          aValue = a.company.toLowerCase();
+          bValue = b.company.toLowerCase();
+          break;
+        case 'status':
+          aValue = a.status;
+          bValue = b.status;
+          break;
+        case 'application_date':
+          aValue = a.application_date || '';
+          bValue = b.application_date || '';
+          break;
+        case 'deadline':
+          aValue = a.deadline || '';
+          bValue = b.deadline || '';
+          break;
+        default:
+          aValue = a.id;
+          bValue = b.id;
+      }
+      
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
 
   const getStatusStyle = (status) => {
     const baseClasses = "status-badge inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold min-w-[80px] text-center";
@@ -120,6 +171,67 @@ function JobList({
 
   return (
     <div className="space-y-4">
+      {/* Search and Sort Controls */}
+      <div className="bg-white rounded-xl shadow-card border border-neutral-pebble p-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          {/* Search */}
+          <div className="flex-1 min-w-0">
+            <label htmlFor="search" className="block text-sm font-medium text-neutral-cadet mb-2">
+              Search Jobs
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                id="search"
+                placeholder="Search by title, company, or notes..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 border border-neutral-pebble rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-all duration-200"
+              />
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-neutral-cadet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          
+          {/* Sort Controls */}
+          <div className="flex gap-2 items-end">
+            <div>
+              <label htmlFor="sortBy" className="block text-sm font-medium text-neutral-cadet mb-2">
+                Sort by
+              </label>
+              <select
+                id="sortBy"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-3 py-2 border border-neutral-pebble rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-all duration-200"
+              >
+                <option value="id">Date Added</option>
+                <option value="title">Title</option>
+                <option value="company">Company</option>
+                <option value="status">Status</option>
+                <option value="application_date">Application Date</option>
+                <option value="deadline">Deadline</option>
+              </select>
+            </div>
+            <button
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="px-3 py-2 border border-neutral-pebble rounded-lg hover:bg-neutral-pebble/50 transition-all duration-200"
+              title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
+            >
+              {sortOrder === 'asc' ? '↑' : '↓'}
+            </button>
+          </div>
+        </div>
+        
+        {/* Results count */}
+        <div className="mt-4 text-sm text-neutral-cadet">
+          Showing {filteredAndSortedJobs.length} of {jobs.length} jobs
+        </div>
+      </div>
+
       {/* Header Row */}
       <div className="bg-neutral-pebble/50 rounded-xl p-6 grid grid-cols-12 gap-4 items-center font-sans text-sm font-bold text-neutral-cadet border border-neutral-pebble">
         <div className="col-span-4">Position</div>
@@ -131,7 +243,7 @@ function JobList({
       </div>
 
       {/* Job Rows */}
-      {filteredJobs.map((job) => {
+      {filteredAndSortedJobs.map((job) => {
         const isExpanded = expandedJobId === job.id;
         return (
           <div
@@ -241,7 +353,7 @@ function JobList({
         );
       })}
 
-      {filteredJobs.length === 0 && (
+      {filteredAndSortedJobs.length === 0 && (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">📋</div>
           <p className="text-neutral-cadet text-lg font-medium">No jobs found</p>
