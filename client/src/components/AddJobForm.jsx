@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-function AddJobForm({ onSuccess, editingJob }) {
+function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCoverLetter }) {
   const [form, setForm] = useState({
     company: "",
     title: "",
@@ -140,7 +140,19 @@ function AddJobForm({ onSuccess, editingJob }) {
         </div>
 
         <div>
-          <label className="block font-semibold text-neutral-cadet mb-2">Cover Letter</label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block font-semibold text-neutral-cadet">Cover Letter</label>
+            {onGenerateCoverLetter && (
+              <button
+                type="button"
+                onClick={onGenerateCoverLetter}
+                className="px-4 py-2 bg-primary-lime text-white rounded-lg shadow hover:bg-primary-lime/80 transition-all duration-200 font-semibold flex items-center space-x-2 text-sm"
+              >
+                <span>📄</span>
+                <span>Generate</span>
+              </button>
+            )}
+          </div>
           <textarea 
             name="cover_letter" 
             value={form.cover_letter} 
@@ -159,13 +171,15 @@ function AddJobForm({ onSuccess, editingJob }) {
             <span>{editingJob ? "Update Job" : "Add Job"}</span>
             <div className="w-2 h-2 bg-primary-lime rounded-full"></div>
           </button>
-          <button 
-            type="button" 
-            onClick={onSuccess}
-            className="px-8 py-3 border border-neutral-cadet text-neutral-cadet rounded-xl hover:bg-neutral-cadet hover:text-white transition-all duration-200 font-semibold"
-          >
-            Cancel
-          </button>
+          {!hideCancel && (
+            <button 
+              type="button" 
+              onClick={onSuccess}
+              className="px-8 py-3 border border-neutral-cadet text-neutral-cadet rounded-xl hover:bg-neutral-cadet hover:text-white transition-all duration-200 font-semibold"
+            >
+              Cancel
+            </button>
+          )}
         </div>
       </form>
     </div>

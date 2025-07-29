@@ -2,11 +2,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import CoverLetterGenerator from "./CoverLetterGenerator";
+import AddJobForm from "./AddJobForm"; // Added import for AddJobForm
 
 function JobList({
   refreshFlag,
   filter,
-  onEdit,
   globalResume,
   cardStyle = "bg-white rounded-xl shadow-card border border-neutral-pebble p-6 transition-all duration-200 hover:shadow-lg hover:border-primary-blue/20",
   titleStyle = "text-lg font-bold text-neutral-highTide font-display tracking-tight",
@@ -17,7 +17,9 @@ function JobList({
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCoverLetterGenerator, setShowCoverLetterGenerator] = useState(false);
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedJob, setSelectedJob] = useState(null); // for expanded card
+  const [expandedJobId, setExpandedJobId] = useState(null); // for expanded card
+  const [refresh, setRefresh] = useState(false); // to trigger refresh after edit/delete
 
   useEffect(() => {
     axios.get("http://localhost:3001/api/jobs")
@@ -29,13 +31,14 @@ function JobList({
         console.error("Error fetching jobs:", err);
         setLoading(false);
       });
-  }, [refreshFlag]);
+  }, [refreshFlag, refresh]);
 
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this job?")) return;
     try {
       await axios.delete(`http://localhost:3001/api/jobs/${id}`);
       setJobs(prev => prev.filter(job => job.id !== id));
+      setExpandedJobId(null);
     } catch (err) {
       console.error("Delete failed:", err);
     }
@@ -74,98 +77,91 @@ function JobList({
     <div className="space-y-4">
       {/* Header Row */}
       <div className="bg-neutral-pebble/50 rounded-xl p-6 grid grid-cols-12 gap-4 items-center font-sans text-sm font-bold text-neutral-cadet border border-neutral-pebble">
-        <div className="col-span-3">Position</div>
+        <div className="col-span-4">Position</div>
         <div className="col-span-2">Company</div>
         <div className="col-span-2">Status</div>
-        <div className="col-span-2">Link</div>
-        <div className="col-span-2">Notes</div>
-        <div className="col-span-1">Actions</div>
+        <div className="col-span-3">Link</div>
+        <div className="col-span-1"></div>
       </div>
 
       {/* Job Rows */}
-      {filteredJobs.map((job) => (
-        <div key={job.id} className={cardStyle}>
-          <div className="grid grid-cols-12 gap-4 items-center">
-            {/* Position */}
-            <div className="col-span-3">
-              <h3 className={titleStyle}>{job.title}</h3>
-            </div>
-
-            {/* Company */}
-            <div className="col-span-2">
-              <p className={metaStyle}>{job.company}</p>
-            </div>
-
-            {/* Status */}
-            <div className="col-span-2">
-              <span className={getStatusStyle(job.status)}>
-                {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
-              </span>
-            </div>
-
-            {/* Link */}
-            <div className="col-span-2">
-              {job.link ? (
-                <a 
-                  href={job.link} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className={linkStyle}
-                >
-                  <span>🔗</span>
-                  <span>View listing</span>
-                </a>
-              ) : (
-                <span className="text-neutral-cadet/40 text-sm font-medium">No link</span>
-              )}
-            </div>
-
-            {/* Notes */}
-            <div className="col-span-2">
-              {job.notes ? (
-                <span className="text-neutral-cadet/60 text-sm">📝</span>
-              ) : (
-                <span className="text-neutral-cadet/30 text-sm">—</span>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="col-span-1 flex items-center justify-end space-x-1 min-w-0">
-              <button
-                onClick={() => onEdit(job)}
-                className="p-2 text-primary-blue hover:bg-primary-blue/10 rounded-lg transition-colors flex-shrink-0"
-                title="Edit job"
-              >
-                ✏️
-              </button>
-              <button
-                onClick={() => handleDelete(job.id)}
-                className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors flex-shrink-0"
-                title="Delete job"
-              >
-                🗑️
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedJob(job);
-                  setShowCoverLetterGenerator(true);
-                }}
-                className="p-2 text-primary-lime hover:bg-primary-lime/10 rounded-lg transition-colors flex-shrink-0"
-                title="Generate cover letter"
-              >
-                📄
-              </button>
-            </div>
+      {filteredJobs.map((job) => {
+        const isExpanded = expandedJobId === job.id;
+        return (
+          <div
+            key={job.id}
+            className={cardStyle + (isExpanded ? " ring-2 ring-primary-blue/30" : " cursor-pointer")}
+            onClick={() => !isExpanded && setExpandedJobId(job.id)}
+          >
+            {!isExpanded ? (
+              <div className="grid grid-cols-12 gap-4 items-center">
+                {/* Position */}
+                <div className="col-span-4">
+                  <h3 className={titleStyle}>{job.title}</h3>
+                </div>
+                {/* Company */}
+                <div className="col-span-2">
+                  <p className={metaStyle}>{job.company}</p>
+                </div>
+                {/* Status */}
+                <div className="col-span-2">
+                  <span className={getStatusStyle(job.status)}>
+                    {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                  </span>
+                </div>
+                {/* Link */}
+                <div className="col-span-3">
+                  {job.link ? (
+                    <a
+                      href={job.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={linkStyle}
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <span>🔗</span>
+                      <span>View listing</span>
+                    </a>
+                  ) : (
+                    <span className="text-neutral-cadet/40 text-sm font-medium">No link</span>
+                  )}
+                </div>
+                {/* No actions or icons on front */}
+                <div className="col-span-1"></div>
+              </div>
+            ) : (
+              <div onClick={e => e.stopPropagation()}>
+                <AddJobForm
+                  editingJob={job}
+                  onSuccess={() => {
+                    setExpandedJobId(null);
+                    setRefresh(r => !r);
+                  }}
+                  onGenerateCoverLetter={() => {
+                    setSelectedJob(job);
+                    setShowCoverLetterGenerator(true);
+                  }}
+                />
+                <div className="flex flex-col md:flex-row gap-4 mt-6 justify-between items-center">
+                  <button
+                    onClick={() => handleDelete(job.id)}
+                    className="px-6 py-3 bg-error text-white rounded-xl shadow hover:bg-error/80 transition-all duration-200 font-semibold flex items-center space-x-2"
+                  >
+                    <span>🗑️</span>
+                    <span>Delete Job</span>
+                  </button>
+                  <button
+                    onClick={() => setExpandedJobId(null)}
+                    className="px-6 py-3 border border-neutral-cadet text-neutral-cadet rounded-xl hover:bg-neutral-cadet hover:text-white transition-all duration-200 font-semibold"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* Notes Display */}
-          {job.notes && (
-            <div className="mt-4 pt-4 border-t border-neutral-pebble">
-              <p className={notesStyle}>{job.notes}</p>
-            </div>
-          )}
-        </div>
-      ))}
+        );
+      })}
 
       {filteredJobs.length === 0 && (
         <div className="text-center py-12">
@@ -183,7 +179,6 @@ function JobList({
             setShowCoverLetterGenerator(false);
             setSelectedJob(null);
           }}
-          onCoverLetterSaved={typeof onCoverLetterSaved === 'function' ? onCoverLetterSaved : undefined}
         />
       )}
     </div>
