@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import JobList from "./components/JobList";
 import AddJobForm from "./components/AddJobForm";
 import GlobalResumeManager from "./components/GlobalResumeManager";
+import LinkedInScraper from "./components/LinkedInScraper";
 import Header from "./components/Header";
 import Logo from "./components/Logo";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -21,6 +22,7 @@ function App() {
   const [editingJob, setEditingJob] = useState(null);
   const [globalResume, setGlobalResume] = useState(localStorage.getItem("globalResume") || "");
   const [showResumeManager, setShowResumeManager] = useState(false);
+  const [showLinkedInScraper, setShowLinkedInScraper] = useState(false);
 
   const handleCoverLetterSaved = () => setRefreshFlag(f => !f);
 
@@ -30,6 +32,12 @@ function App() {
     setShowForm((prev) => !prev);
   };
   const handleManageResume = () => setShowResumeManager(true);
+  const handleLinkedInScraper = () => setShowLinkedInScraper(true);
+  const handleJobsImported = (count) => {
+    setRefreshFlag(f => !f);
+    // You could add a toast notification here
+    console.log(`${count} jobs imported successfully!`);
+  };
 
   return (
     <ErrorBoundary>
@@ -37,6 +45,7 @@ function App() {
         <Header
           onAddJob={handleAddJob}
           onManageResume={handleManageResume}
+          onLinkedInScraper={handleLinkedInScraper}
           showForm={showForm}
           editingJob={editingJob}
         />
@@ -104,6 +113,14 @@ function App() {
                     />
                   </div>
                 </div>
+              )}
+              
+              {/* LinkedIn Scraper Modal */}
+              {showLinkedInScraper && (
+                <LinkedInScraper
+                  onClose={() => setShowLinkedInScraper(false)}
+                  onJobsImported={handleJobsImported}
+                />
               )}
             </>
           } />

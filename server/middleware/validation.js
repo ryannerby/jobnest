@@ -34,6 +34,10 @@ const jobSchema = Joi.object({
     .messages({
       'string.uri': 'Link must be a valid URL'
     }),
+  location: Joi.string().trim().max(100).allow('', null)
+    .messages({
+      'string.max': 'Location cannot exceed 100 characters'
+    }),
   cover_letter: Joi.string().trim().max(5000).allow('', null)
     .messages({
       'string.max': 'Cover letter cannot exceed 5000 characters'

@@ -1,7 +1,7 @@
 import React from "react";
 import Logo from "./Logo";
 
-const Header = ({ onAddJob, onManageResume, showForm, editingJob }) => {
+const Header = ({ onAddJob, onManageResume, onLinkedInScraper, showForm, editingJob }) => {
   return (
     <header className="bg-white shadow-md py-4 px-6 flex items-center justify-between">
       {/* Logo/Brand */}
@@ -20,8 +20,15 @@ const Header = ({ onAddJob, onManageResume, showForm, editingJob }) => {
           )}
         </button>
         <button
+          onClick={onLinkedInScraper}
+          className="px-8 py-3 bg-primary-lime text-neutral-highTide rounded-xl shadow-lime-glow hover:shadow-lg transition-all duration-200 font-semibold flex items-center space-x-2"
+        >
+          <span>🔗</span>
+          <span>LinkedIn Scraper</span>
+        </button>
+        <button
           onClick={onManageResume}
-          className="px-8 py-3 bg-primary-lime text-neutral-highTide rounded-xl shadow-lime-glow hover:shadow-lg transition-all duration-200 font-semibold"
+          className="px-8 py-3 bg-neutral-pebble text-neutral-highTide rounded-xl shadow-card hover:shadow-lg transition-all duration-200 font-semibold"
         >
           Manage Resume
         </button>

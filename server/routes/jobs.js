@@ -22,13 +22,13 @@ router.get('/', async (req, res) => {
 
 // POST a new job
 router.post('/', validateJob, async (req, res) => {
-  const { company, title, status, application_date, deadline, notes, link, cover_letter } = req.body;
+  const { company, title, status, application_date, deadline, notes, link, location, cover_letter } = req.body;
   try {
     const result = await pool.query(
-      `INSERT INTO jobs (company, title, status, application_date, deadline, notes, link, cover_letter)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO jobs (company, title, status, application_date, deadline, notes, link, location, cover_letter)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
-      [company, title, status, application_date, deadline, notes, link, cover_letter]
+      [company, title, status, application_date, deadline, notes, link, location, cover_letter]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -43,7 +43,7 @@ router.post('/', validateJob, async (req, res) => {
 // PUT (update) a job by ID
 router.put('/:id', validateJob, async (req, res) => {
   const { id } = req.params;
-  const { company, title, status, application_date, deadline, notes, link, cover_letter } = req.body;
+  const { company, title, status, application_date, deadline, notes, link, location, cover_letter } = req.body;
   
   try {
     // Check if job exists
@@ -64,10 +64,11 @@ router.put('/:id', validateJob, async (req, res) => {
          deadline = $5,
          notes = $6,
          link = $7,
-         cover_letter = $8
-       WHERE id = $9
+         location = $8,
+         cover_letter = $9
+       WHERE id = $10
        RETURNING *`,
-      [company, title, status, application_date, deadline, notes, link, cover_letter, id]
+      [company, title, status, application_date, deadline, notes, link, location, cover_letter, id]
     );
     res.json(result.rows[0]);
   } catch (err) {
