@@ -1,7 +1,7 @@
 import React from "react";
 import Logo from "./Logo";
 
-const Header = ({ onAddJob, onManageResume, onLinkedInScraper, showForm, editingJob }) => {
+const Header = ({ onAddJob, onManageResume, onLinkedInScraper, onDataManager, showForm, editingJob }) => {
   return (
     <header className="bg-white shadow-md py-4 px-6 flex items-center justify-between">
       {/* Logo/Brand */}
@@ -31,6 +31,13 @@ const Header = ({ onAddJob, onManageResume, onLinkedInScraper, showForm, editing
           className="px-8 py-3 bg-neutral-pebble text-neutral-highTide rounded-xl shadow-card hover:shadow-lg transition-all duration-200 font-semibold"
         >
           Manage Resume
+        </button>
+        <button
+          onClick={onDataManager}
+          className="px-8 py-3 bg-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 font-semibold flex items-center space-x-2"
+        >
+          <span>💾</span>
+          <span>Data Manager</span>
         </button>
       </div>
     </header>
