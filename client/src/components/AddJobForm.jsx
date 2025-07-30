@@ -225,11 +225,12 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
           <div>
             <label className="block font-semibold text-neutral-cadet mb-2">Deadline</label>
             <input 
-              type="date" 
+              type="text" 
               name="deadline" 
               value={form.deadline} 
               onChange={handleChange} 
               className="w-full border border-neutral-pebble rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-blue/20 focus:border-primary-blue transition-all" 
+              placeholder="e.g., 12/31/2024 or ASAP"
             />
           </div>
         </div>
