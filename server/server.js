@@ -64,10 +64,8 @@ app.use((req, res, next) => {
 
 // Routes
 const jobRoutes = require('./routes/jobs');
-const linkedInScraperRoutes = require('./routes/linkedin-scraper');
 
 app.use('/api/jobs', jobRoutes);
-app.use('/api/scrape-linkedin', linkedInScraperRoutes);
 
 // Root route
 app.get('/', (req, res) => {

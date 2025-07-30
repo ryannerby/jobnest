@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import JobList from "./components/JobList";
 import AddJobForm from "./components/AddJobForm";
 import GlobalResumeManager from "./components/GlobalResumeManager";
-import LinkedInScraper from "./components/LinkedInScraper";
+
 import Dashboard from "./components/Dashboard";
 import DataManager from "./components/DataManager";
 import Header from "./components/Header";
@@ -25,7 +25,7 @@ function App() {
   const [editingJob, setEditingJob] = useState(null);
   const [globalResume, setGlobalResume] = useState(localStorage.getItem("globalResume") || "");
   const [showResumeManager, setShowResumeManager] = useState(false);
-  const [showLinkedInScraper, setShowLinkedInScraper] = useState(false);
+
   const [showDataManager, setShowDataManager] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [jobsLoading, setJobsLoading] = useState(true);
@@ -38,13 +38,9 @@ function App() {
     setShowForm((prev) => !prev);
   };
   const handleManageResume = () => setShowResumeManager(true);
-  const handleLinkedInScraper = () => setShowLinkedInScraper(true);
+
   const handleDataManager = () => setShowDataManager(true);
-  const handleJobsImported = (count) => {
-    setRefreshFlag(f => !f);
-    // You could add a toast notification here
-    console.log(`${count} jobs imported successfully!`);
-  };
+
 
   // Fetch jobs from API
   useEffect(() => {
@@ -70,7 +66,6 @@ function App() {
         <Header
           onAddJob={handleAddJob}
           onManageResume={handleManageResume}
-          onLinkedInScraper={handleLinkedInScraper}
           onDataManager={handleDataManager}
           showForm={showForm}
           editingJob={editingJob}
@@ -142,13 +137,7 @@ function App() {
                 </div>
               )}
               
-              {/* LinkedIn Scraper Modal */}
-              {showLinkedInScraper && (
-                <LinkedInScraper
-                  onClose={() => setShowLinkedInScraper(false)}
-                  onJobsImported={handleJobsImported}
-                />
-              )}
+
               
               {/* Data Manager Modal */}
               {showDataManager && (
