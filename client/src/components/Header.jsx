@@ -6,7 +6,7 @@ const Header = ({ onAddJob, onManageResume, onLinkedInScraper, showForm, editing
     <header className="bg-white shadow-md py-4 px-6 flex items-center justify-between">
       {/* Logo/Brand */}
       <div className="flex items-center gap-2">
-        <Logo size="xsmall" />
+        <Logo size="medium" />
       </div>
       {/* Action Buttons */}
       <div className="flex gap-4">
