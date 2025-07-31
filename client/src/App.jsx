@@ -62,7 +62,7 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-neutral-pebble to-white text-neutral-highTide font-sans">
+      <div className="min-h-screen bg-gray-100 text-gray-800 font-sans">
         <Header
           onAddJob={handleAddJob}
           onManageResume={handleManageResume}
@@ -80,10 +80,10 @@ function App() {
                   <button
                     key={status}
                     onClick={() => setFilter(status)}
-                    className={`px-6 py-3 rounded-xl border-2 font-semibold transition-all duration-200 text-sm shadow-card
+                    className={`px-6 py-3 rounded-lg border-2 font-semibold transition-all duration-200 text-sm
                       ${filter === status
-                        ? "bg-primary-blue text-white border-primary-blue shadow-punch"
-                        : "border-neutral-cadet text-neutral-cadet hover:bg-neutral-cadet hover:text-white hover:shadow-card"}`}
+                        ? "bg-blue-500 text-white border-blue-500 shadow-md"
+                        : "border-gray-300 text-gray-600 hover:bg-blue-50 hover:border-blue-300"}`}
                   >
                     {status[0].toUpperCase() + status.slice(1)}
                   </button>

@@ -10,9 +10,9 @@ function JobList({
   globalResume,
   jobs = [],
   onJobsUpdate,
-  cardStyle = "bg-white rounded-xl shadow-card border border-neutral-pebble p-6 transition-all duration-200 hover:shadow-lg hover:border-primary-blue/20",
-  titleStyle = "text-lg font-bold text-neutral-highTide font-display tracking-tight",
-  metaStyle = "text-sm font-medium text-neutral-cadet font-sans"
+  cardStyle = "bg-white rounded-lg shadow-md border border-gray-200 p-6 transition-all duration-200 hover:shadow-lg hover:border-blue-300",
+  titleStyle = "text-lg font-bold text-gray-800 font-display tracking-tight",
+  metaStyle = "text-sm font-medium text-gray-600 font-sans"
 }) {
   const [showCoverLetterGenerator, setShowCoverLetterGenerator] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -152,17 +152,17 @@ function JobList({
     const baseClasses = "status-badge inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold min-w-[80px] text-center";
     switch (status) {
       case 'applied':
-        return `${baseClasses} status-applied text-primary-blue border border-primary-blue/20 shadow-sm`;
+        return `${baseClasses} bg-blue-500 text-white shadow-sm`;
       case 'interview':
-        return `${baseClasses} status-interview text-warning border border-warning/20 shadow-sm`;
+        return `${baseClasses} bg-yellow-500 text-white shadow-sm`;
       case 'offer':
-        return `${baseClasses} status-offer text-success border border-success/20 shadow-sm`;
+        return `${baseClasses} bg-green-500 text-white shadow-sm`;
       case 'rejected':
-        return `${baseClasses} status-rejected text-error border border-error/20 shadow-sm`;
+        return `${baseClasses} bg-red-500 text-white shadow-sm`;
       case 'wishlist':
-        return `${baseClasses} status-wishlist text-neutral-highTide border border-primary-lime/20 shadow-sm`;
+        return `${baseClasses} bg-purple-500 text-white shadow-sm`;
       default:
-        return `${baseClasses} bg-neutral-cadet/10 text-neutral-cadet border border-neutral-cadet/20 shadow-sm`;
+        return `${baseClasses} bg-gray-500 text-white shadow-sm`;
     }
   };
 
@@ -201,7 +201,7 @@ function JobList({
       />
 
       {/* Header Row */}
-      <div className="bg-neutral-pebble/50 rounded-xl p-6 grid grid-cols-12 gap-4 items-center font-sans text-sm font-bold text-neutral-cadet border border-neutral-pebble">
+      <div className="bg-gray-50 rounded-lg p-6 grid grid-cols-12 gap-4 items-center font-sans text-sm font-bold text-gray-700 border border-gray-200">
         <div className="col-span-4">Position</div>
         <div className="col-span-2">Company</div>
         <div className="col-span-2 text-center">Status</div>

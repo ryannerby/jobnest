@@ -177,7 +177,7 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
 
   const getFieldError = (fieldName) => {
     return errors[fieldName] ? (
-      <p className="text-error text-sm mt-1">{errors[fieldName]}</p>
+      <p className="text-red-500 text-sm mt-1">{errors[fieldName]}</p>
     ) : null;
   };
 
@@ -249,21 +249,21 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-card border border-neutral-pebble p-8">
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary-blue rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-lg">📝</span>
           </div>
-          <h2 className="text-2xl font-bold text-neutral-highTide font-display">
+          <h2 className="text-2xl font-bold text-gray-800 font-display">
             {editingJob ? "Edit Job" : "Add New Job"}
           </h2>
         </div>
         {editingJob && (
-          <div className="flex items-center space-x-2 text-sm text-neutral-cadet">
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
             {isSaving && (
               <div className="flex items-center space-x-1">
-                <div className="w-3 h-3 border-2 border-primary-blue border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                 <span>Saving...</span>
               </div>
             )}
@@ -271,7 +271,7 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
               <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
             )}
             {hasUnsavedChanges && (
-              <span className="text-warning">• Unsaved changes</span>
+              <span className="text-yellow-600">• Unsaved changes</span>
             )}
           </div>
         )}
@@ -280,19 +280,19 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Job Description Parser - Show first */}
         {showJobDescriptionInput && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+          <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-primary-blue rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-lg">🤖</span>
                 </div>
-                <h3 className="text-lg font-bold text-neutral-highTide">Smart Job Description Parser</h3>
+                <h3 className="text-lg font-bold text-gray-800">Smart Job Description Parser</h3>
               </div>
               <button
                 type="button"
                 onClick={handleParseJobDescription}
                 disabled={isProcessing}
-                className="px-6 py-3 bg-primary-blue text-white rounded-lg shadow hover:bg-primary-blue/80 transition-all duration-200 font-semibold flex items-center space-x-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-all duration-200 font-semibold flex items-center space-x-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? (
                   <>
@@ -307,14 +307,14 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
                 )}
               </button>
             </div>
-            <p className="text-neutral-cadet text-sm mb-4">
+            <p className="text-gray-600 text-sm mb-4">
               Paste a job description below and click "Extract & Generate" to intelligently extract all job details, generate a tailored cover letter, and create a customized resume based on your global resume data.
             </p>
             <textarea 
               name="job_description" 
               value={form.job_description} 
               onChange={handleChange} 
-              className={`w-full border border-blue-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-blue/20 focus:border-primary-blue transition-all resize-none whitespace-pre-wrap leading-relaxed ${errors.job_description ? 'border-red-500' : ''}`}
+              className={`w-full border border-blue-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none whitespace-pre-wrap leading-relaxed ${errors.job_description ? 'border-red-500' : ''}`}
               rows="8"
               placeholder="Paste the full job description here..."
               style={{ minHeight: '200px' }}
@@ -330,12 +330,12 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block font-semibold text-neutral-cadet mb-2">Company *</label>
+                <label className="block font-semibold text-gray-700 mb-2">Company *</label>
                 <input 
                   name="company" 
                   value={form.company} 
                   onChange={handleChange} 
-                  className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-blue/20 focus:border-primary-blue transition-all ${errors.company ? 'border-error' : 'border-neutral-pebble'}`}
+                  className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${errors.company ? 'border-red-500' : 'border-gray-300'}`}
                   required 
                 />
                 {getFieldError('company')}
