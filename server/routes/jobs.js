@@ -22,13 +22,16 @@ router.get('/', async (req, res) => {
 
 // POST a new job
 router.post('/', validateJob, async (req, res) => {
-  const { company, title, status, application_date, deadline, notes, link, location, cover_letter } = req.body;
+  const { 
+    company, title, status, application_date, deadline, notes, link, location, cover_letter,
+    job_description, hiring_manager, salary, job_type, requirements, benefits
+  } = req.body;
   try {
     const result = await pool.query(
-      `INSERT INTO jobs (company, title, status, application_date, deadline, notes, link, location, cover_letter)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO jobs (company, title, status, application_date, deadline, notes, link, location, cover_letter, job_description, hiring_manager, salary, job_type, requirements, benefits)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING *`,
-      [company, title, status, application_date, deadline, notes, link, location, cover_letter]
+      [company, title, status, application_date, deadline, notes, link, location, cover_letter, job_description, hiring_manager, salary, job_type, requirements, benefits]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -43,7 +46,10 @@ router.post('/', validateJob, async (req, res) => {
 // PUT (update) a job by ID
 router.put('/:id', validateJob, async (req, res) => {
   const { id } = req.params;
-  const { company, title, status, application_date, deadline, notes, link, location, cover_letter } = req.body;
+  const { 
+    company, title, status, application_date, deadline, notes, link, location, cover_letter,
+    job_description, hiring_manager, salary, job_type, requirements, benefits
+  } = req.body;
   
   try {
     // Check if job exists
@@ -65,10 +71,16 @@ router.put('/:id', validateJob, async (req, res) => {
          notes = $6,
          link = $7,
          location = $8,
-         cover_letter = $9
-       WHERE id = $10
+         cover_letter = $9,
+         job_description = $10,
+         hiring_manager = $11,
+         salary = $12,
+         job_type = $13,
+         requirements = $14,
+         benefits = $15
+       WHERE id = $16
        RETURNING *`,
-      [company, title, status, application_date, deadline, notes, link, location, cover_letter, id]
+      [company, title, status, application_date, deadline, notes, link, location, cover_letter, job_description, hiring_manager, salary, job_type, requirements, benefits, id]
     );
     res.json(result.rows[0]);
   } catch (err) {
@@ -233,5 +245,56 @@ function extractKeywords(text) {
   
   return commonKeywords.filter(keyword => text.includes(keyword));
 }
+
+// Claude API proxy route to avoid CORS issues
+router.post('/claude-proxy', async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required' });
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'Claude API key not configured' });
+    }
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 4000,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Claude API error:', response.status, errorText);
+      return res.status(response.status).json({ 
+        error: `API call failed: ${response.status} ${response.statusText}`,
+        details: errorText
+      });
+    }
+
+    const data = await response.json();
+    res.json({ content: data.content[0].text });
+    
+  } catch (error) {
+    console.error('Claude proxy error:', error);
+    res.status(500).json({ error: `Proxy error: ${error.message}` });
+  }
+});
 
 module.exports = router;

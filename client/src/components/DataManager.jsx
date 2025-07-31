@@ -100,12 +100,12 @@ const DataManager = ({ jobs, onClose }) => {
               <button
                 onClick={handleExportBackup}
                 disabled={isExporting}
-                className="p-3 sm:p-4 border-2 border-dashed border-primary-blue rounded-lg hover:bg-primary-blue/5 transition-all duration-200 text-center min-h-[120px] flex flex-col items-center justify-center"
+                className="p-3 sm:p-4 border-2 border-dashed border-green-600 rounded-lg hover:bg-green-50 transition-all duration-200 text-center min-h-[120px] flex flex-col items-center justify-center"
               >
                 <div className="text-2xl sm:text-3xl mb-2">💾</div>
                 <div className="font-semibold text-neutral-highTide text-sm sm:text-base">Full Backup</div>
                 <div className="text-xs sm:text-sm text-neutral-cadet">Export all data as JSON</div>
-                {isExporting && <div className="text-xs text-primary-blue mt-2">Exporting...</div>}
+                {isExporting && <div className="text-xs text-green-600 mt-2">Exporting...</div>}
               </button>
               
               <button
@@ -136,7 +136,7 @@ const DataManager = ({ jobs, onClose }) => {
                   className="hidden"
                   disabled={isImporting}
                 />
-                <div className="px-3 sm:px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-primary-blue/90 transition-all duration-200 inline-block text-sm sm:text-base">
+                <div className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 inline-block text-sm sm:text-base">
                   {isImporting ? 'Importing...' : 'Choose Backup File'}
                 </div>
               </label>

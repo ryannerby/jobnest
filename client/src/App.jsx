@@ -114,27 +114,17 @@ function App() {
                 }}
                 onCoverLetterSaved={handleCoverLetterSaved}
               />
-              {/* Resume Manager Modal (only in Home view) */}
+              {/* Resume Manager Modal */}
               {showResumeManager && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-lg shadow-lg p-6 relative max-w-2xl w-full">
-                    <button
-                      onClick={() => setShowResumeManager(false)}
-                      className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl font-bold"
-                      aria-label="Close"
-                    >
-                      &times;
-                    </button>
-                    <GlobalResumeManager
-                      globalResume={globalResume}
-                      onUpdateResume={(resume) => {
-                        setGlobalResume(resume);
-                        localStorage.setItem("globalResume", resume);
-                      }}
-                      onClose={() => setShowResumeManager(false)}
-                    />
-                  </div>
-                </div>
+                <GlobalResumeManager
+                  globalResume={globalResume}
+                  onUpdateResume={(newResume) => {
+                    setGlobalResume(newResume);
+                    localStorage.setItem("globalResume", newResume);
+                    setShowResumeManager(false);
+                  }}
+                  onClose={() => setShowResumeManager(false)}
+                />
               )}
               
 

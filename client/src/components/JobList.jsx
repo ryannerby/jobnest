@@ -1,5 +1,5 @@
 // src/components/JobList.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import CoverLetterGenerator from "./CoverLetterGenerator";
 import AddJobForm from "./AddJobForm";
@@ -31,7 +31,7 @@ function JobList({
     const filtered = filterJobs(jobs, filterConfig.filters);
     const sorted = sortJobs(filtered, filterConfig.sortBy, filterConfig.sortOrder);
     setFilteredJobs(sorted);
-  }, [jobs, filterConfig]);
+  }, [jobs, filterConfig.filters, filterConfig.sortBy, filterConfig.sortOrder]); // Use specific properties instead of the entire object
 
   // Keyboard navigation
   useEffect(() => {
@@ -69,12 +69,12 @@ function JobList({
   };
 
   // Handle filter changes
-  const handleFilterChange = (newFilterConfig) => {
+  const handleFilterChange = useCallback((newFilterConfig) => {
     setFilterConfig(newFilterConfig);
-  };
+  }, []);
 
   // Handle bulk operations
-  const handleBulkOperation = async (action, selectedIds) => {
+  const handleBulkOperation = useCallback(async (action, selectedIds) => {
     if (action === 'delete') {
       if (!confirm(`Are you sure you want to delete ${selectedIds.length} jobs?`)) return;
       
@@ -101,19 +101,19 @@ function JobList({
         console.error("Bulk status update failed:", err);
       }
     }
-  };
+  }, [jobs, onJobsUpdate]);
 
   // Handle export
-  const handleExport = (selectedIds) => {
+  const handleExport = useCallback((selectedIds) => {
     try {
       exportToCSV(jobs, selectedIds);
     } catch (err) {
       console.error("Export failed:", err);
     }
-  };
+  }, [jobs]);
 
   // Handle import
-  const handleImport = async (file) => {
+  const handleImport = useCallback(async (file) => {
     try {
       const importedJobs = await importFromCSV(file);
       
@@ -146,7 +146,7 @@ function JobList({
       console.error("Import failed:", err);
       alert('Import failed. Please check the file format.');
     }
-  };
+  }, [onJobsUpdate]);
 
   const getStatusStyle = (status) => {
     const baseClasses = "status-badge inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold min-w-[80px] text-center";
@@ -277,31 +277,37 @@ function JobList({
               </div>
             ) : (
               <div onClick={e => e.stopPropagation()} className="space-y-6 animate-fade-in">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-primary-blue rounded-xl flex items-center justify-center">
-                      <span className="text-white font-bold text-lg">✏️</span>
+                {/* Editable Job Details */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-primary-blue rounded-xl flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">✏️</span>
+                      </div>
+                      <h2 className="text-2xl font-bold text-neutral-highTide font-display">Edit Job</h2>
                     </div>
-                    <h2 className="text-2xl font-bold text-neutral-highTide font-display">Edit Job</h2>
+                    <button
+                      onClick={() => setExpandedJobId(null)}
+                      className="w-10 h-10 bg-neutral-pebble rounded-xl flex items-center justify-center text-neutral-cadet hover:bg-neutral-cadet hover:text-white transition-all duration-200 text-xl font-bold"
+                    >
+                      ×
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setExpandedJobId(null)}
-                    className="w-10 h-10 bg-neutral-pebble rounded-xl flex items-center justify-center text-neutral-cadet hover:bg-neutral-cadet hover:text-white transition-all duration-200 text-xl font-bold"
-                  >
-                    ×
-                  </button>
+                  
+                  <AddJobForm
+                    editingJob={job}
+                    onSuccess={() => {
+                      setExpandedJobId(null);
+                    }}
+                    onGenerateCoverLetter={() => {
+                      setSelectedJob(job);
+                      setShowCoverLetterGenerator(true);
+                    }}
+                    hideCancel={true}
+                  />
                 </div>
-                <AddJobForm
-                  editingJob={job}
-                  onSuccess={() => {
-                    setExpandedJobId(null);
-                  }}
-                  onGenerateCoverLetter={() => {
-                    setSelectedJob(job);
-                    setShowCoverLetterGenerator(true);
-                  }}
-                  hideCancel={true}
-                />
+
+                {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center pt-4 border-t border-neutral-pebble">
                   <button
                     onClick={() => handleDelete(job.id)}

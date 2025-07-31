@@ -22,9 +22,9 @@ const jobSchema = Joi.object({
     .messages({
       'date.format': 'Application date must be a valid date (YYYY-MM-DD)'
     }),
-  deadline: Joi.date().iso().allow(null, '')
+  deadline: Joi.string().trim().max(100).allow('', null)
     .messages({
-      'date.format': 'Deadline must be a valid date (YYYY-MM-DD)'
+      'string.max': 'Deadline cannot exceed 100 characters'
     }),
   notes: Joi.string().trim().max(1000).allow('', null)
     .messages({
@@ -41,6 +41,30 @@ const jobSchema = Joi.object({
   cover_letter: Joi.string().trim().max(5000).allow('', null)
     .messages({
       'string.max': 'Cover letter cannot exceed 5000 characters'
+    }),
+  job_description: Joi.string().trim().max(10000).allow('', null)
+    .messages({
+      'string.max': 'Job description cannot exceed 10000 characters'
+    }),
+  hiring_manager: Joi.string().trim().max(100).allow('', null)
+    .messages({
+      'string.max': 'Hiring manager cannot exceed 100 characters'
+    }),
+  salary: Joi.string().trim().max(100).allow('', null)
+    .messages({
+      'string.max': 'Salary cannot exceed 100 characters'
+    }),
+  job_type: Joi.string().trim().max(50).allow('', null)
+    .messages({
+      'string.max': 'Job type cannot exceed 50 characters'
+    }),
+  requirements: Joi.string().trim().max(5000).allow('', null)
+    .messages({
+      'string.max': 'Requirements cannot exceed 5000 characters'
+    }),
+  benefits: Joi.string().trim().max(5000).allow('', null)
+    .messages({
+      'string.max': 'Benefits cannot exceed 5000 characters'
     })
 });
 
