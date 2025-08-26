@@ -7,10 +7,10 @@ import GlobalResumeManager from "./components/GlobalResumeManager";
 import Dashboard from "./components/Dashboard";
 import DataManager from "./components/DataManager";
 import Header from "./components/Header";
-import Logo from "./components/Logo";
+
 import ErrorBoundary from "./components/ErrorBoundary";
 
-const statuses = ["all", "wishlist", "applied", "interview", "offer", "rejected"];
+
 
 // Placeholder components
 const AddJobPage = () => <div className="py-8"> <h2 className="text-2xl font-bold mb-4">Add Job</h2> <AddJobForm /> </div>;
@@ -21,7 +21,7 @@ const MyApplicationsPage = () => <div className="py-8"> <h2 className="text-2xl 
 function App() {
   const [showForm, setShowForm] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
-  const [filter, setFilter] = useState("all");
+
   const [editingJob, setEditingJob] = useState(null);
   const [globalResume, setGlobalResume] = useState(localStorage.getItem("globalResume") || "");
   const [showResumeManager, setShowResumeManager] = useState(false);
@@ -74,21 +74,7 @@ function App() {
         <Routes>
           <Route path="/" element={
             <>
-              {/* Filter Buttons */}
-              <div className="flex flex-wrap gap-3 mb-8">
-                {statuses.map((status) => (
-                  <button
-                    key={status}
-                    onClick={() => setFilter(status)}
-                    className={`px-6 py-3 rounded-lg border-2 font-semibold transition-all duration-200 text-sm
-                      ${filter === status
-                        ? "bg-blue-500 text-white border-blue-500 shadow-md"
-                        : "border-gray-300 text-gray-600 hover:bg-blue-50 hover:border-blue-300"}`}
-                  >
-                    {status[0].toUpperCase() + status.slice(1)}
-                  </button>
-                ))}
-              </div>
+
               {/* Form Section */}
               {showForm && (
                 <div className="mb-8">
