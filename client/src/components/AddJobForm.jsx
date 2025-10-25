@@ -1,8 +1,7 @@
 // src/components/AddJobForm.jsx
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { parseJobDescription, formatParsedData } from "../utils/jobDescriptionParser.js";
-import { parseJobDescriptionWithAI, formatAIResponseForForm, setGlobalResume, getGlobalResume } from "../utils/aiJobParser.js";
+import { parseJobDescriptionWithAI, formatAIResponseForForm } from "../utils/aiJobParser.js";
 
 function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCoverLetter }) {
   const [form, setForm] = useState({
