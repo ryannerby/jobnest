@@ -117,7 +117,7 @@ export const importFromCSV = async (file) => {
           });
         
         resolve(jobs);
-      } catch (error) {
+      } catch {
         reject(new Error('Failed to parse CSV file'));
       }
     };
@@ -191,7 +191,7 @@ export const importBackup = async (file) => {
         }
         
         resolve(backup.data);
-      } catch (error) {
+      } catch {
         reject(new Error('Failed to parse backup file'));
       }
     };

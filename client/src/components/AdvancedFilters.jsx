@@ -46,7 +46,7 @@ const AdvancedFilters = ({
     }
   };
 
-  const handleSelectJob = (jobId) => {
+  const _handleSelectJob = (jobId) => {
     setSelectedJobs(prev => 
       prev.includes(jobId) 
         ? prev.filter(id => id !== jobId)

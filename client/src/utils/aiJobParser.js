@@ -2,7 +2,7 @@
 // This replaces the regex-based parser with intelligent AI extraction
 
 // Function to get API key from environment (works in both browser and Node.js)
-function getClaudeAPIKey() {
+function _getClaudeAPIKey() {
   console.log('🔍 Checking API key availability...');
   
   if (typeof import.meta !== 'undefined' && import.meta.env) {
@@ -12,7 +12,7 @@ function getClaudeAPIKey() {
     return browserKey;
   }
   
-  const nodeKey = process.env.VITE_CLAUDE_API_KEY;
+  const nodeKey = import.meta.env.VITE_CLAUDE_API_KEY;
   console.log('🖥️ Node.js environment detected');
   console.log('🔑 Node.js API key:', nodeKey ? 'Found' : 'Not found');
   return nodeKey;

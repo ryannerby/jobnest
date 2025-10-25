@@ -96,7 +96,7 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [hideCancel, onSuccess]);
+  }, [hideCancel, onSuccess, handleSubmit]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -109,7 +109,7 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
 
     console.log('Form submission - form data:', form);
@@ -172,7 +172,7 @@ function AddJobForm({ onSuccess, editingJob, hideCancel = false, onGenerateCover
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [form, validateForm, editingJob, onSuccess, errors]);
 
   const getFieldError = (fieldName) => {
     return errors[fieldName] ? (

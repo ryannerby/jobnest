@@ -28,7 +28,7 @@ function App() {
 
   const [showDataManager, setShowDataManager] = useState(false);
   const [jobs, setJobs] = useState([]);
-  const [jobsLoading, setJobsLoading] = useState(true);
+  const [_jobsLoading, setJobsLoading] = useState(true);
 
   const handleCoverLetterSaved = () => setRefreshFlag(f => !f);
 

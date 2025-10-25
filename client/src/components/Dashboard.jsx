@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
-const Dashboard = ({ jobs, onRefresh }) => {
+const Dashboard = ({ jobs }) => {
   const [widgets, setWidgets] = useState(() => {
     const saved = localStorage.getItem('dashboard-widgets');
     return saved ? JSON.parse(saved) : getDefaultWidgets();
@@ -164,6 +164,7 @@ const Dashboard = ({ jobs, onRefresh }) => {
                       <DashboardWidget
                         widget={widget}
                         jobs={jobs}
+                        availableWidgets={availableWidgets}
                         onChangeSize={(size) => changeWidgetSize(widget.id, size)}
                         onToggle={() => toggleWidget(widget.id)}
                         onRemove={() => removeWidget(widget.id)}
@@ -182,7 +183,7 @@ const Dashboard = ({ jobs, onRefresh }) => {
 };
 
 // Individual Widget Component
-const DashboardWidget = ({ widget, jobs, onChangeSize, onToggle, onRemove }) => {
+const DashboardWidget = ({ widget, jobs, availableWidgets, onChangeSize, onRemove }) => {
   const renderWidgetContent = () => {
     switch (widget.id) {
       case 'stats':
@@ -271,7 +272,7 @@ const StatsWidget = ({ jobs }) => {
   const applied = jobs.filter(job => job.status === 'applied').length;
   const interviews = jobs.filter(job => job.status === 'interview').length;
   const offers = jobs.filter(job => job.status === 'offer').length;
-  const rejected = jobs.filter(job => job.status === 'rejected').length;
+  const _rejected = jobs.filter(job => job.status === 'rejected').length;
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -470,7 +471,7 @@ const ApplicationTimelineWidget = ({ jobs }) => {
 
   return (
     <div className="space-y-2">
-      {timelineData.map((job, index) => (
+      {timelineData.map((job) => (
         <div key={job.id} className="flex items-center gap-3">
           <div className="w-2 h-2 bg-primary-blue rounded-full"></div>
           <div className="flex-1 min-w-0">
